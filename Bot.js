@@ -37,7 +37,7 @@ module.exports = class {
         } else if (bit <= 23) {
             new_steps = this.take(bit - 16);
         } else if (bit >= 8) {
-            new_steps += bit%5;
+            new_steps += bit % 5;
         }
         if (Map.map[this.pos[0]][this.pos[1]] instanceof Eat) {
             Map.map[this.pos[0]][this.pos[1]] = new Empty(this.pos[0], this.pos[1]);
@@ -114,10 +114,10 @@ module.exports = class {
             nx--;
         }
         if (nx >= 0 && nx < Map.max_x && ny >= 0 && ny < Map.max_y) {
-            if(Map.map[nx][ny] instanceof Poison){
-                global.map.createStructure(nx, ny, { 1: Eat })
+            if (Map.map[nx][ny] instanceof Poison) {
+                global.map.createStructure(nx, ny, [{ type: Eat, chance: 1 }]);
                 let value = Map.map[nx][ny].reaction;
-                global.map.createStructure(nx, ny, { 1: Empty })
+                global.map.createStructure(nx, ny, [{ type: Empty, chance: 1 }]);
                 return value;
             }
             return Map.map[nx][ny].reaction;

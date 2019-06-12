@@ -5,45 +5,47 @@ const Wall = require('./entities/Wall');
 
 const Extra = require('./Extra');
 
-var classic_chanses = {
-    70: Eat,
-    0: Empty,
-    10: Poison,
-    10: Wall,
-}
 
+var classic_chances = [
+    { type: Eat, chance: 70 },
+    { type: Empty, chance: 0 },
+    { type: Poison, chance: 10 },
+    { type: Wall, chance: 10 },
+];
 
-var Map = {
+var WorldMap = {
     max_x: 511,
     max_y: 128,
     map: [],
     generate() {
-        this.map = new Array(this.max_x);
-        for (let x = 0; x < this.max_x; x++) {
-            this.map[x] = new Array(this.max_y);
-            for (let y = 0; y < this.max_y; y++) {
-                this.createStructure(x,y,classic_chanses);
+        this.map = [];
+        for (let x = this.max_x; x--;) {
+            this.map[x] = [];
+            for (let y = this.max_y; y--;) {
+                this.map[x][y] = this.createStructure(x, y, classic_chances);
+
             }
         }
     },
-    createStructure(x,y,chases){
-        this.map[x][y] = new (this.randomGenStruc(chases))(x, y);
+    createStructure(x, y, chance) {
+        let a = this.randomGenStruc(chance);
+        return (this.map[x][y] = new a(x,y));
     },
-    randomGenStruc(chanses) {
-        matrix = [];
-        for (let chanse in chanses) {
-            for (let i = 0; i < chanse; i++) {
-                matrix.push(chanses[chanse]);
-            }
+    randomGenStruc(chances) {
+        let matrix = [];
+        for (let i in chances) {
+            let item = chances[i];
+            matrix = matrix.concat(new Array(item.chance).fill(item.type, 0));
         }
         matrix.sort(() => Math.random() - 0.5);
-        return matrix[Extra.random(0, matrix.length)];
-    }  
+        let rand = Extra.random(0, matrix.length);
+        return matrix[rand];
+    }
 }
 
-if(global.map == undefined){
-    global.map = Map;
-    Map.generate()
+if (global.map == undefined) {
+    global.map = WorldMap;
+    WorldMap.generate()
 }
 
 module.exports = global.map;

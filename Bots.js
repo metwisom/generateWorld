@@ -15,7 +15,7 @@ var bots = {
             this.bots.push(new Bot());
         }
         setInterval(() => {
-            for (let i = 9; i; i--){
+            for (let i = 999; i; i--){
                 for (let i in this.bots) {
                     this.bots[i].action();
                     this.actions++;
