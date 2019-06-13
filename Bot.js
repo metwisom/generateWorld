@@ -1,11 +1,10 @@
-const Bots = require('./Bots');
-const Extra = require('./Extra');
-const Map = require('./Map');
+const Extra = require(`./Extra`);
+const Map = require(`./Map`);
 
-const Eat = require('./entities/Eat');
-const Empty = require('./entities/Empty');
-const Poison = require('./entities/Poison');
-const Wall = require('./entities/Wall');
+const Eat = require(`./entities/Eat`);
+const Empty = require(`./entities/Empty`);
+const Poison = require(`./entities/Poison`);
+const Wall = require(`./entities/Wall`);
 
 
 module.exports = class {
@@ -125,5 +124,5 @@ module.exports = class {
         return 4;
     }
 
-}
+};
 

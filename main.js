@@ -1,5 +1,5 @@
-const Map = require("./Map");
-const Server = require('./Server');
-const Bots = require('./Bots');
+const Map = require(`./Map`);
+require(`./Server`);
+require(`./Bots`);
 
 Map.generate();

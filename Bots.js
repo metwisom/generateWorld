@@ -1,8 +1,10 @@
+/* eslint-disable no-console */
 
-const Bot = require('./Bot');
-const Events = require('./Events');
+const Bot = require(`./Bot`);
+const Events = require(`./Events`);
+const sqlite = require(`./sqlite`);
 
-var bots_count = 64
+var bots_count = 64;
 
 
 var bots = {
@@ -10,12 +12,26 @@ var bots = {
     saved_bots: [],
     bots: [],
     actions: 0,
-    start() {
-        for (let i = 0; i < bots_count; i++) {
-            this.bots.push(new Bot());
-        }
+    start: async () => {
+        await sqlite.query(`select * from t_bot`)
+            .then(data => {
+                if (data.length > 0) {
+                    console.log(`Есть данные`);
+                    for (let i in data) {
+                        let bot = data[i];
+                        for (let i = 0; i < bots_count / 8; i++) {
+                            this.bots.push(new Bot(JSON.parse(bot.genom)));
+                        }
+                    }
+                } else {
+                    console.log(`Нет данных`);
+                    for (let i = 0; i < bots_count; i++) {
+                        this.bots.push(new Bot());
+                    }
+                }
+            });
         setInterval(() => {
-            for (let i = 999; i; i--){
+            for (let i = 999; i; i--) {
                 for (let i in this.bots) {
                     this.bots[i].action();
                     this.actions++;
@@ -28,12 +44,18 @@ var bots = {
                         return;
                     }
                 }
-                Events.tick()
+                Events.tick();
             }
         }, 1);
     },
-    createGenerate() {
+    createGenerate: async () => {
         this.bots = [];
+        await sqlite.set(`DELETE FROM t_bot`);
+        for (let i in this.saved_bots) {
+            let bot = this.saved_bots[i];
+            let genom = JSON.stringify(bot.genom);
+            await sqlite.set(`INSERT INTO t_bot(genom) VALUES('${genom}')`);
+        }
         this.saved_bots.forEach(bot => {
             for (let i = 0; i < bots_count / 8; i++) {
                 this.bots.push(new Bot(bot.genom.slice(0), i == bots_count / 8 - 1));
@@ -44,11 +66,11 @@ var bots = {
         console.log(this.actions);
         this.actions = 0;
     }
-}
+};
 
 if (global.bots == undefined) {
     global.bots = bots;
-    bots.start()
+    bots.start();
 }
 
 

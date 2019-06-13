@@ -1,9 +1,9 @@
-const Eat = require('./entities/Eat');
-const Empty = require('./entities/Empty');
-const Poison = require('./entities/Poison');
-const Wall = require('./entities/Wall');
+const Eat = require(`./entities/Eat`);
+const Empty = require(`./entities/Empty`);
+const Poison = require(`./entities/Poison`);
+const Wall = require(`./entities/Wall`);
 
-const Extra = require('./Extra');
+const Extra = require(`./Extra`);
 
 
 var classic_chances = [
@@ -29,7 +29,7 @@ var WorldMap = {
     },
     createStructure(x, y, chance) {
         let a = this.randomGenStruc(chance);
-        return (this.map[x][y] = new a(x,y));
+        return (this.map[x][y] = new a(x, y));
     },
     randomGenStruc(chances) {
         let matrix = [];
@@ -41,11 +41,11 @@ var WorldMap = {
         let rand = Extra.random(0, matrix.length);
         return matrix[rand];
     }
-}
+};
 
 if (global.map == undefined) {
     global.map = WorldMap;
-    WorldMap.generate()
+    WorldMap.generate();
 }
 
 module.exports = global.map;

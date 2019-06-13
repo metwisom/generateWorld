@@ -1,4 +1,4 @@
-const Extra = require('../Extra');
+const Extra = require(`../Extra`);
 
 module.exports = class {
     constructor(x, y) {
@@ -7,4 +7,4 @@ module.exports = class {
         this.reaction = 1;
         this.capacity = Extra.random(20, 60);
     }
-}
+};

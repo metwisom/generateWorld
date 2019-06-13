@@ -2,30 +2,68 @@
 <html lang="en">
 
 <head>
+    <style>
+        body {
+            overflow: hidden;
+            margin: 0;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Game</title>
 </head>
 
 <body>
     <canvas width='100%' height='100%' id='b'></canvas>
 </body>
-<style>
-    body{
-        overflow: hidden;
-        margin: 0;
-        height: 100vh;
-        width: 100vw;
-    }
-    canvas{
-        width: 100%;
-        height: 100%;
-    }
-</style>
+
+
 </html>
 <script>
     'use strict';
+    var gx = 0;
+    var gy = 0;
+    var is_drag = false;
+    var lx = 0;
+    var ly = 0;
+
+    var zoom = 1;
+    var potential_zoom = 1;
+    var current_zoom = 1;
+
+    document.addEventListener('wheel', (e) => {
+        console.log(e)
+        current_zoom -= e.wheelDelta / 120;
+        potential_zoom = 1 / (current_zoom > 0 ? current_zoom : 1 / -(current_zoom - 1))
+    })
+
+    document.addEventListener('mousedown', (e) => {
+        is_drag = true;
+        lx = e.clientX;
+        ly = e.clientY;
+    })
+
+    document.addEventListener('mouseup', (e) => {
+        is_drag = false
+    })
+
+    document.addEventListener('mousemove', (e) => {
+        if (is_drag) {
+            gx -= (lx - e.clientX) / 1
+            gy -= (ly - e.clientY) / 1
+            lx = e.clientX;
+            ly = e.clientY;
+        }
+    })
+
     var requestAnimFrame = (function () {
         return window.requestAnimationFrame ||
             window.webkitRequestAnimationFrame ||
@@ -45,44 +83,62 @@
     canvas.height = document.body.clientHeight
     var context = canvas.getContext("2d");
     var map = [];
-    var bots;
-    function draw() {
-        requestAnimFrame(draw);
+    var bots = [];
 
+    var gfps = 0, fps = 0;
+
+    setInterval(() => { gfps = fps; fps = 0; }, 1000)
+
+    function draw() {
+        if (zoom != potential_zoom && Math.abs(zoom - potential_zoom) < 0.01) {
+            zoom = potential_zoom;
+        }
+        if (zoom != potential_zoom) {
+            zoom += (potential_zoom - zoom) / 10;
+        }
         context.fillStyle = '#9f9';
-        context.fillRect(0, 0, 9999, 9999);
-        context.fillStyle = '#9f9';        
-        if(map[0] == undefined){
+        context.fillRect(0, 0, canvas.width, canvas.height);
+        context.fillStyle = '#9f9';
+        if (map[0] == undefined) {
+            requestAnimFrame(draw, canvas);
             return;
         }
-        for (let x in map) {
-            for (let y in map[x]) {
-                if (map[x][y] == 2) {
+        for (let i in map) {
+            let item = map[i]
+            let x = item[0];
+            let y = item[1];
+            switch (item[2]) {
+                case 2:
                     context.fillStyle = '#fff';
-                }
-                if (map[x][y] == 1) {
-                   continue;
-                }
-                if (map[x][y] == 3) {
+                    break;
+                case 3:
                     context.fillStyle = '#f99';
-                }
-                if (map[x][y] == 4) {
+                    break;
+                case 4:
                     context.fillStyle = '#ddd';
-                }
-                context.fillRect(x * 5, y * 5, 5, 5);
+                    break;
+                default:
+                    context.fillStyle = '#f00';
+                    break;
             }
+            context.fillRect(gx + x * 5 * zoom, gy + y * 5 * zoom, 5 * zoom, 5 * zoom);
+
         }
         context.fillStyle = '#000';
-        //requestAnimFrame(draw)
         bots.forEach(bot => {
-            context.fillRect(bot[0] * 5, bot[1] * 5, 5, 5);
+            context.beginPath();
+            context.ellipse(gx + bot[0] * 5 * zoom + 2.5 * zoom, gy + bot[1] * 5 * zoom + 2.5 * zoom, 2.5 * zoom, 2.5 * zoom, 0, 0, 2 * Math.PI);
+            context.fill();
         });
-        //requestAnimFrame(draw)
+        context.font = "12px serif";
+        context.fillText(gfps, 10, 10);
+        fps++;
+        requestAnimFrame(draw, canvas);
     }
 
-    requestAnimFrame(draw)
+    requestAnimFrame(draw, canvas)
 
-    var socket = new WebSocket("ws://127.0.0.1:8080");
+    var socket = new WebSocket("ws://127.0.0.1:8765");
     socket.onclose = (event) => console.log('Код: ' + event.code + ' причина: ' + event.reason);
     socket.onmessage = function (event) {
         let data = JSON.parse(event.data);

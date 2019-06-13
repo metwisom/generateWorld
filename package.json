@@ -1,0 +1,24 @@
+{
+  "name": "htdocs",
+  "version": "1.0.0",
+  "description": "Изучение генетических алгоритмов",
+  "main": "main.js",
+  "dependencies": {
+    "better-sqlite3": "^5.4.0",
+    "ws": "^7.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/metwisom/geneticWorld.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/metwisom/geneticWorld/issues"
+  },
+  "homepage": "https://github.com/metwisom/geneticWorld#readme"
+}
