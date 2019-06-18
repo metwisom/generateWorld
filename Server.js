@@ -2,23 +2,33 @@ const Map = require(`./Map`);
 const Bots = require(`./Bots`);
 const Eat = require(`./entities/Eat`);
 
-let map_for_send = `{}`;
-setInterval(() => {
-    let send_bots = Bots.bots.filter(e => e).map(e => e.pos);
+var bot_for_send = { type: 'bot', data: [] }
+var map_for_send = { type: 'map', data: [] };
+
+function createData() {
+    bot_for_send = Bots.bots.filter(e => e).map(e => e.pos);
+    bot_for_send = { type: 'bot', data: bot_for_send }
+
     let send_map = [];
     Map.map.map(e => e.filter(e => !(e instanceof Eat)).map(t => send_map.push([t.x, t.y, t.reaction])));
-    map_for_send = JSON.stringify([send_map, send_bots]);
-}, 10);
+    map_for_send = { type: 'map', data: send_map };
+    setTimeout(() => createData(), 1)
+}
+createData();
 
-var server = {
+const server = {
     start() {
         const WebSocket = require(`ws`);
         const wss = new WebSocket.Server({ port: 8765 });
         wss.on(`connection`, function connection(ws) {
-            let a = setInterval(() => {
-                ws.send(map_for_send);
-            }, 1000);
-            ws.on(`close`, () => clearInterval(a));
+            ws.on(`message`, (data) => {
+                if (data == 'map') {
+                    ws.send(JSON.stringify(map_for_send));
+                }
+                if (data == 'bot') {
+                    ws.send(JSON.stringify(bot_for_send));
+                }
+            });
         });
     }
 };

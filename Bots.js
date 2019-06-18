@@ -1,18 +1,17 @@
-/* eslint-disable no-console */
-
 const Bot = require(`./Bot`);
 const Events = require(`./Events`);
 const sqlite = require(`./sqlite`);
 
-var bots_count = 64;
+const bots_count = 64;
 
-
-var bots = {
-    generation: 0,
-    saved_bots: [],
-    bots: [],
-    actions: 0,
-    start: async () => {
+class Bots {
+    constructor() {
+        this.generation = 0
+        this.saved_bots = []
+        this.bots = []
+        this.actions = 0
+    }
+    async start() {
         await sqlite.query(`select * from t_bot`)
             .then(data => {
                 if (data.length > 0) {
@@ -31,7 +30,7 @@ var bots = {
                 }
             });
         setInterval(() => {
-            for (let i = 999; i; i--) {
+            for (let i = 9999; i; i--) {
                 for (let i in this.bots) {
                     this.bots[i].action();
                     this.actions++;
@@ -41,14 +40,16 @@ var bots = {
                             this.saved_bots.push(this.bots[i]);
                         }
                         this.createGenerate();
+
+                        Events.clear();
                         return;
                     }
                 }
                 Events.tick();
             }
         }, 1);
-    },
-    createGenerate: async () => {
+    }
+    async createGenerate() {
         this.bots = [];
         await sqlite.set(`DELETE FROM t_bot`);
         for (let i in this.saved_bots) {
@@ -69,8 +70,8 @@ var bots = {
 };
 
 if (global.bots == undefined) {
-    global.bots = bots;
-    bots.start();
+    global.bots = new Bots();
+    global.bots.start();
 }
 
 

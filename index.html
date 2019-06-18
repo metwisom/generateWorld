@@ -75,9 +75,6 @@
             };
     })();
 
-
-
-
     var canvas = document.getElementById("b");
     canvas.width = document.body.clientWidth
     canvas.height = document.body.clientHeight
@@ -122,7 +119,6 @@
                     break;
             }
             context.fillRect(gx + x * 5 * zoom, gy + y * 5 * zoom, 5 * zoom, 5 * zoom);
-
         }
         context.fillStyle = '#000';
         bots.forEach(bot => {
@@ -142,10 +138,20 @@
     socket.onclose = (event) => console.log('Код: ' + event.code + ' причина: ' + event.reason);
     socket.onmessage = function (event) {
         let data = JSON.parse(event.data);
-        map = data[0]
-        bots = data[1]
+        if(data.type == 'map'){
+            map = data.data;
+            socket.send('map');
+        }
+        if(data.type == 'bot'){
+            bots = data.data;
+            socket.send('bot');
+        }
     };
-    socket.onopen = () => console.log("Соединение установлено.");
+    socket.onopen = () => {
+        socket.send('map');
+        socket.send('bot');
+        console.log("Соединение установлено.")
+    };
     socket.onerror = (error) => console.log("Ошибка " + error.message);;
 
 </script>

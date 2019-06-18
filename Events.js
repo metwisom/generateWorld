@@ -14,5 +14,11 @@ module.exports = {
                 this.events[i].time--;
             }
         }
+    },
+    clear() {
+        for (let i in this.events) {
+            this.events[i].cb();
+            delete this.events[i];
+        }
     }
 };

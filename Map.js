@@ -7,9 +7,9 @@ const Extra = require(`./Extra`);
 
 
 var classic_chances = [
-    { type: Eat, chance: 70 },
+    { type: Eat, chance: 50 },
     { type: Empty, chance: 0 },
-    { type: Poison, chance: 10 },
+    { type: Poison, chance: 1 },
     { type: Wall, chance: 10 },
 ];
 

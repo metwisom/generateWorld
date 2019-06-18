@@ -5,6 +5,6 @@ module.exports = class {
         this.x = x;
         this.y = y;
         this.reaction = 1;
-        this.capacity = Extra.random(20, 60);
+        this.capacity = Extra.random(1, 6);
     }
 };
