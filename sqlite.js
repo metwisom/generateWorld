@@ -1,13 +1,22 @@
-const dbPromise = require(`better-sqlite3`)(`./db.sqlite`, {/*verbose: console.log*/ });
+const sqlite3 = require('sqlite3');
+const { open } = require('sqlite');
+
+
+const dbPromise = open({
+    filename: './db.sqlite',
+    driver: sqlite3.cached.Database
+})
+
+
 
 module.exports = {
     async query(sql) {
-        return dbPromise.prepare(sql).all();
+        return dbPromise.then(db => db.all(sql));
     },
     async get(sql) {
-        return dbPromise.prepare(sql).get();
+        return dbPromise.then(db => db.get(sql));
     },
     async set(sql) {
-        return dbPromise.prepare(sql).run();
+        return dbPromise.then(db => db.run(sql));
     }
 };

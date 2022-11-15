@@ -4,10 +4,10 @@
   "description": "Изучение генетических алгоритмов",
   "main": "main.js",
   "dependencies": {
-    "better-sqlite3": "^5.4.0",
+    "sqlite": "^4.1.2",
+    "sqlite3": "^5.0.11",
     "ws": "^7.0.0"
   },
-  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -8,7 +8,8 @@ const Wall = require(`./entities/Wall`);
 
 
 var Bot = class {
-    constructor(genom, rand) {
+    constructor(genom, rand, touched = []) {
+        this.touched = [];
         this.has_block
         this.angle = 0;
         this.react = 2;
@@ -17,6 +18,7 @@ var Bot = class {
         this.life = 50;
         this.current_step = 0;
         this.genom = new Array(64);
+        this.actions = 0;
         if (genom != undefined) {
             this.genom = genom;
         } else {
@@ -25,11 +27,16 @@ var Bot = class {
             }
         }
         if (rand) {
-            this.genom[Extra.random(0, 64)] = Extra.random(0, 64);
+            for(let index of touched){
+                this.genom[index] = Extra.random(0, 64);
+            }
+            
         }
     }
     action() {
         let gone = true;
+        this.touched.push(this.current_step);
+        this.actions++;
         while (gone) {
             let bit = this.genom[this.current_step];
             let new_steps = 0;

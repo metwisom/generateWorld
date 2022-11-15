@@ -30,7 +30,7 @@ class Bots {
                 }
             });
         setInterval(() => {
-            for (let i = 9999; i; i--) {
+            for(let i = 0;i < 10000;i++){                
                 for (let i in this.bots) {
                     this.bots[i].action();
                     this.actions++;
@@ -42,7 +42,7 @@ class Bots {
                         this.createGenerate();
 
                         Events.clear();
-                        return;
+                        break;
                     }
                 }
                 Events.tick();
@@ -59,7 +59,7 @@ class Bots {
         }
         this.saved_bots.forEach(bot => {
             for (let i = 0; i < bots_count / 8; i++) {
-                this.bots.push(new Bot(bot.genom.slice(0), i == bots_count / 8 - 1));
+                this.bots.push(new Bot([...bot.genom], i == bots_count / 8 - 1));
             }
         });
         this.saved_bots = [];

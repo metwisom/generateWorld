@@ -6,6 +6,7 @@ var bot_for_send = { type: 'bot', data: [] }
 var map_for_send = { type: 'map', data: [] };
 
 function createData() {
+    //console.log(Bots.bots)
     bot_for_send = Bots.bots.filter(e => e).map(e => e.pos);
     bot_for_send = { type: 'bot', data: bot_for_send }
 
@@ -26,7 +27,8 @@ const server = {
                     ws.send(JSON.stringify(map_for_send));
                 }
                 if (data == 'bot') {
-                    ws.send(JSON.stringify(bot_for_send));
+                    //if(bot_for_send.data.length != 0)
+                        ws.send(JSON.stringify(bot_for_send));
                 }
             });
         });

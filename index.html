@@ -57,8 +57,8 @@
 
     document.addEventListener('mousemove', (e) => {
         if (is_drag) {
-            gx -= (lx - e.clientX) / 1
-            gy -= (ly - e.clientY) / 1
+            gx -= (lx - e.clientX) / zoom
+            gy -= (ly - e.clientY) / zoom
             lx = e.clientX;
             ly = e.clientY;
         }
@@ -87,45 +87,57 @@
     setInterval(() => { gfps = fps; fps = 0; }, 1000)
 
     function draw() {
+        context.setTransform(1, 0, 0, 1, 0, 0);
         if (zoom != potential_zoom && Math.abs(zoom - potential_zoom) < 0.01) {
             zoom = potential_zoom;
         }
         if (zoom != potential_zoom) {
             zoom += (potential_zoom - zoom) / 10;
         }
-        context.fillStyle = '#9f9';
+        context.fillStyle = '#999';
         context.fillRect(0, 0, canvas.width, canvas.height);
         context.fillStyle = '#9f9';
+        context.translate(canvas.width / 2, canvas.height / 2)
+        context.scale(zoom, zoom)
+        context.translate(-canvas.width / 2, -canvas.height / 2)
+        context.translate(gx, gy)
         if (map[0] == undefined) {
             requestAnimFrame(draw, canvas);
             return;
         }
         for (let i in map) {
             let item = map[i]
+            if(item[2] == 0){
+                continue;
+            }
             let x = item[0];
             let y = item[1];
             switch (item[2]) {
+                case 1:
+                    context.fillStyle = '#0f0';
+                    break;
                 case 2:
-                    context.fillStyle = '#fff';
+                    context.fillStyle = '#5f5';
                     break;
                 case 3:
-                    context.fillStyle = '#f99';
+                    context.fillStyle = '#9f9';
                     break;
                 case 4:
-                    context.fillStyle = '#ddd';
+                    context.fillStyle = '#bfb';
                     break;
                 default:
                     context.fillStyle = '#f00';
                     break;
             }
-            context.fillRect(gx + x * 5 * zoom, gy + y * 5 * zoom, 5 * zoom, 5 * zoom);
+            context.fillRect(x * 5, y * 5, 5, 5);
         }
         context.fillStyle = '#000';
         bots.forEach(bot => {
             context.beginPath();
-            context.ellipse(gx + bot[0] * 5 * zoom + 2.5 * zoom, gy + bot[1] * 5 * zoom + 2.5 * zoom, 2.5 * zoom, 2.5 * zoom, 0, 0, 2 * Math.PI);
+            context.ellipse(bot[0] * 5 + 2.5, bot[1] * 5 + 2.5, 2.5, 2.5, 0, 0, 2 * Math.PI);
             context.fill();
         });
+        context.setTransform(1, 0, 0, 1, 0, 0);
         context.font = "12px serif";
         context.fillText(gfps, 10, 10);
         fps++;
@@ -133,17 +145,18 @@
     }
 
     requestAnimFrame(draw, canvas)
-
+    connect()
+function connect(){
     var socket = new WebSocket("ws://127.0.0.1:8765");
-    socket.onclose = (event) => console.log('Код: ' + event.code + ' причина: ' + event.reason);
+    socket.onclose = (event) => setTimeout(() => connect(),100);
     socket.onmessage = function (event) {
         let data = JSON.parse(event.data);
-        if(data.type == 'map'){
-            map = data.data;
+        if (data.type == 'map') {
+            map = data.data || [];
             socket.send('map');
         }
-        if(data.type == 'bot'){
-            bots = data.data;
+        if (data.type == 'bot') {
+            bots = data.data || [];
             socket.send('bot');
         }
     };
@@ -153,5 +166,7 @@
         console.log("Соединение установлено.")
     };
     socket.onerror = (error) => console.log("Ошибка " + error.message);;
+}
+   
 
 </script>
